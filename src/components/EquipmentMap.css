@@ -1,0 +1,61 @@
+/* EquipmentMap.css */
+
+/* Customize popup content */
+.popup-content h3 {
+    color: #007bff;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* Tracking button styles */
+.tracking-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    z-index: 1000;
+    transition: all 0.3s;
+}
+
+.tracking-btn.start {
+    background-color: #28a745;
+}
+
+.tracking-btn.stop {
+    background-color: #dc3545;
+}
+
+.tracking-btn:hover {
+    transform: scale(1.1);
+}
+
+/* Add a slight shadow to the map */
+.leaflet-container {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Style for marker tooltips (if you want to show them instead of popups) */
+.leaflet-tooltip {
+    background-color: #ffeb3b;
+    color: #000;
+    font-size: 14px;
+    border-radius: 4px;
+    padding: 5px;
+}
+
+.gps-status {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    z-index: 1000;
+}
