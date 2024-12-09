@@ -31,19 +31,13 @@ const MapUpdater = ({ position }) => {
     return null;
 };
 
-const EquipmentMap = ({ tracking, setTracking, equipmentPositions, paths }) => {
+const EquipmentMap = ({ tracking, setTracking, equipmentPositions, paths, isDesktop }) => {
     const [mapReady, setMapReady] = useState(false);
-    const firstPosition = equipmentPositions[0];
-    
-    // Use current position or fallback to a default
-    const mapCenter = firstPosition?.latitude && firstPosition?.longitude
-        ? [firstPosition.latitude, firstPosition.longitude]
-        : [0, 0]; // Default to world center if no position yet
 
     return (
         <div style={{ height: '100vh', position: 'relative' }}>
             <MapContainer
-                center={mapCenter}
+                center={[0, 0]}
                 zoom={15}
                 style={{ height: '100%' }}
                 whenReady={() => setMapReady(true)}
@@ -52,8 +46,6 @@ const EquipmentMap = ({ tracking, setTracking, equipmentPositions, paths }) => {
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 />
-
-                {mapReady && <MapUpdater position={mapCenter} />}
 
                 {equipmentPositions.map((equipment) => (
                     equipment?.latitude && equipment?.longitude ? (
@@ -64,13 +56,12 @@ const EquipmentMap = ({ tracking, setTracking, equipmentPositions, paths }) => {
                             >
                                 <Popup className="popup-content">
                                     <h3>{equipment.name}</h3>
+                                    <p>Device ID: {equipment.id}</p>
                                     <p>Latitude: {equipment.latitude.toFixed(6)}</p>
                                     <p>Longitude: {equipment.longitude.toFixed(6)}</p>
                                     <p>Speed: {((equipment.speed || 0) * 3.6).toFixed(1)} km/h</p>
                                     <p>Accuracy: ±{(equipment.accuracy || 0).toFixed(1)}m</p>
-                                    <p>Last Update: {equipment.lastUpdate ? 
-                                        new Date(equipment.lastUpdate).toLocaleTimeString() : 
-                                        'Waiting for GPS...'}</p>
+                                    <p>Last Update: {new Date(equipment.lastUpdate).toLocaleTimeString()}</p>
                                 </Popup>
                             </Marker>
 
@@ -87,16 +78,18 @@ const EquipmentMap = ({ tracking, setTracking, equipmentPositions, paths }) => {
                 ))}
             </MapContainer>
 
-            <div
-                className={`tracking-btn ${tracking ? 'stop' : 'start'}`}
-                onClick={() => setTracking(!tracking)}
-            >
-                {tracking ? 'Stop Tracking' : 'Start Tracking'}
-            </div>
+            {!isDesktop && (
+                <div
+                    className={`tracking-btn ${tracking ? 'stop' : 'start'}`}
+                    onClick={() => setTracking(!tracking)}
+                >
+                    {tracking ? 'Stop Tracking' : 'Start Tracking'}
+                </div>
+            )}
 
-            {!firstPosition?.latitude && (
-                <div className="gps-status">
-                    Waiting for GPS signal...
+            {isDesktop && (
+                <div className="desktop-info">
+                    Viewing live tracking data from mobile devices
                 </div>
             )}
         </div>
