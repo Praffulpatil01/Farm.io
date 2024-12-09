@@ -18,13 +18,40 @@ let DefaultIcon = L.icon({
 
 L.Marker.prototype.options.icon = DefaultIcon;
 
-// Component to update map center when position changes
+// Add custom icons
+const tractorIcon = L.icon({
+    iconUrl: '/images/tractor-icon.png', // Add these icons to your public folder
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+    popupAnchor: [0, -32]
+});
+
+const harvesterIcon = L.icon({
+    iconUrl: '/images/harvester-icon.png',
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+    popupAnchor: [0, -32]
+});
+
+// Function to get icon based on equipment type
+const getEquipmentIcon = (equipmentType) => {
+    switch (equipmentType) {
+        case 'tractor':
+            return tractorIcon;
+        case 'harvester':
+            return harvesterIcon;
+        default:
+            return DefaultIcon;
+    }
+};
+
+// Component to update map center and zoom when position changes
 const MapUpdater = ({ position }) => {
     const map = useMap();
     
     useEffect(() => {
         if (position && position[0] && position[1]) {
-            map.setView(position, map.getZoom());
+            map.setView(position, 15); // Set zoom level to 15
         }
     }, [position, map]);
     
@@ -52,7 +79,7 @@ const EquipmentMap = ({ tracking, setTracking, equipmentPositions, paths, isDesk
                         <React.Fragment key={equipment.id}>
                             <Marker
                                 position={[equipment.latitude, equipment.longitude]}
-                                icon={DefaultIcon}
+                                icon={getEquipmentIcon(equipment.type)}
                             >
                                 <Popup className="popup-content">
                                     <h3>{equipment.name}</h3>
@@ -68,11 +95,14 @@ const EquipmentMap = ({ tracking, setTracking, equipmentPositions, paths, isDesk
                             {paths[equipment.id]?.length > 1 && (
                                 <Polyline 
                                     positions={paths[equipment.id]} 
-                                    color="blue"
+                                    color={equipment.pathColor || "blue"}
                                     weight={3}
                                     opacity={0.7}
                                 />
                             )}
+
+                            {/* Update map view to follow the equipment */}
+                            <MapUpdater position={[equipment.latitude, equipment.longitude]} />
                         </React.Fragment>
                     ) : null
                 ))}

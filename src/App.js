@@ -106,7 +106,6 @@ const App = () => {
 
     return (
         <Router>
-            {/* Only show GPS tracker on mobile devices */}
             {!isDesktop && (
                 <GpsTracker 
                     onLocationUpdate={handleLocationUpdate}

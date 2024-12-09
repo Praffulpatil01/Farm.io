@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const GpsTracker = ({ onLocationUpdate, tracking }) => {
+const GpsTracker = ({ onLocationUpdate, tracking, deviceId = 'mobile-1' }) => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
@@ -17,14 +17,23 @@ const GpsTracker = ({ onLocationUpdate, tracking }) => {
                 // Watch position continuously
                 watchId = navigator.geolocation.watchPosition(
                     (position) => {
-                        const { latitude, longitude, accuracy, speed } = position.coords;
-                        onLocationUpdate({
-                            latitude,
-                            longitude,
-                            accuracy,
-                            speed: speed || 0,
-                            timestamp: position.timestamp
-                        });
+                        const locationData = {
+                            id: deviceId,
+                            name: `Mobile Device ${deviceId}`,
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                            accuracy: position.coords.accuracy,
+                            speed: position.coords.speed || 0,
+                            lastUpdate: new Date().toISOString()
+                        };
+
+                        // Store in localStorage
+                        const existingData = JSON.parse(localStorage.getItem('trackingData') || '[]');
+                        const updatedData = existingData.filter(item => item.id !== deviceId);
+                        updatedData.push(locationData);
+                        localStorage.setItem('trackingData', JSON.stringify(updatedData));
+
+                        onLocationUpdate(locationData);
                         setError(null);
                     },
                     (err) => {
@@ -48,7 +57,7 @@ const GpsTracker = ({ onLocationUpdate, tracking }) => {
                 navigator.geolocation.clearWatch(watchId);
             }
         };
-    }, [tracking, onLocationUpdate]);
+    }, [tracking, onLocationUpdate, deviceId]);
 
     return null; // This is a functional component, no UI needed
 };
